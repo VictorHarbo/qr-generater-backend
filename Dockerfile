@@ -1,24 +1,24 @@
-# Use an official Maven image to handle the build process
+# Use maven image
 FROM maven:3.9.9-eclipse-temurin-23 AS builder
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Replace <GITHUB_URL> with your repository's URL
+# Clone project from github
 RUN apt-get update && apt-get install -y git && \
     git clone https://github.com/VictorHarbo/qr-generater-backend.git .
 
-# Run Maven to build the project
+# Build project with maven
 RUN mvn clean package
 
-# Use a lightweight JDK runtime image to run the application
+# Java version to run the program
 FROM openjdk:23
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the built JAR file from the builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Copy the built JAR file from the builder
+COPY --from=builder /app/target/*.jar qr-generater-backend.jar
 
-# Specify the command to run the application
-CMD ["java", "-jar", "app.jar"]
+# Run the application
+CMD ["java", "-jar", "qr-generater-backend.jar"]
