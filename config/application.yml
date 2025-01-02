@@ -1,0 +1,19 @@
+name: qr-generater-backend
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+environment: local
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: server
+environment: server
+logging:
+  file:
+    name: ~/logs/qr-generater-backend.log
