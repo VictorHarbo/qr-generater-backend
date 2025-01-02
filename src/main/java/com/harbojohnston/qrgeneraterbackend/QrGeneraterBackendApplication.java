@@ -43,10 +43,12 @@ public class QrGeneraterBackendApplication {
     @GetMapping("/status")
     public String status() {
         log.info("Status endpoint called.");
+        log.info("The following values are to be delivered through the endpoint: Name: '{}', Environment: '{}'", config.getName(), config.getEnvironment());
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> jsonData = new HashMap<>();
+        jsonData.put("Application", config.getName());
         jsonData.put("Environment", config.getEnvironment());
 
         try {
