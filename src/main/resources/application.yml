@@ -16,4 +16,4 @@ spring:
 environment: server
 logging:
   file:
-    name: ~/logs/qr-generater-backend.log
+    name: ./logs/qr-generater-backend.log
