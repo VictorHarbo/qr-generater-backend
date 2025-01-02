@@ -20,5 +20,5 @@ WORKDIR /app
 # Copy the built JAR file from the builder
 COPY --from=builder /app/target/*.jar qr-generater-backend.jar
 
-# Run the application
-CMD ["java", "-jar", "qr-generater-backend.jar"]
+# Run the application with the server configuration active
+CMD ["java", "-Dspring.profiles.active=server", "-jar", "qr-generater-backend.jar"]
