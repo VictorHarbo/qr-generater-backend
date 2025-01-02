@@ -32,8 +32,6 @@ public class QrController {
         }
 
         int uniCodeCodePoints = url.codePointCount(0, url.length());
-
-        log.info("URL has '{}' unicode code points.", url.codePointCount(0, url.length()));
         if (uniCodeCodePoints > 738){
             String message = "URl is too long, we cannot guarantee a working QR code.";
             log.error(message);
@@ -56,6 +54,7 @@ public class QrController {
             headers.set("Content-Type", "image/jpeg");
             headers.setContentDisposition(ContentDisposition.attachment().filename("qrcode.jpeg").build());
 
+            log.info("Returning a QR code for URL: '{}'", url);
             return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
         } catch (IOException e) {
             log.error("IOException while generating QR code", e);
