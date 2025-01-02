@@ -8,6 +8,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y git && \
     git clone https://github.com/VictorHarbo/qr-generater-backend.git .
 
+# Install less for better file viewing
+RUN apt-get install less
+
 # Build project with maven
 RUN mvn clean package
 
