@@ -5,14 +5,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.Objects;
 
 /**
  * Generate a simple QR code for an input URL.
  */
 public class QrGenerator {
-    private static Logger log = LoggerFactory.getLogger(QrGenerator.class);
+    private static final Logger log = LoggerFactory.getLogger(QrGenerator.class);
 
 
     /**
@@ -20,13 +19,11 @@ public class QrGenerator {
      * @param url to generate QR code from.
      * @return a BufferedImage object containing the QR.
      */
-    public static BufferedImage generate(String url) throws IOException {
+    public static BufferedImage generate(String url) {
         validateInputUrl(url);
 
         QrCode qrCode = QrCode.encodeText(url, QrCode.Ecc.MEDIUM);
-        BufferedImage img = toImage(qrCode, 4, 10);
-
-        return img;
+        return toImage(qrCode, 4, 10);
     }
 
     private static BufferedImage toImage(QrCode qr, int scale, int border) {

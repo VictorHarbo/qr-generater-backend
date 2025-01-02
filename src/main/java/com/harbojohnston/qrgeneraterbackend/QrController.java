@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @RestController
 public class QrController {
-    private static Logger log = LoggerFactory.getLogger(QrController.class);
+    private static final Logger log = LoggerFactory.getLogger(QrController.class);
 
     @GetMapping("/generateQr")
     public ResponseEntity<byte[]> generateQr(@RequestParam() String url) {
