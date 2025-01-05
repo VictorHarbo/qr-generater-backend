@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +19,11 @@ import java.util.Map;
 public class QrGeneraterBackendApplication {
     private static final Logger log = LoggerFactory.getLogger(QrGeneraterBackendApplication.class);
 
-    @Autowired
-    private YAMLConfig config;
+    @Value("${name}")
+    private String applicationName;
+
+    @Value("${environment}")
+    private String environment;
 
     public static void main(String[] args) {
         SpringApplication.run(QrGeneraterBackendApplication.class, args);
@@ -43,13 +46,13 @@ public class QrGeneraterBackendApplication {
     @GetMapping("/status")
     public String status() {
         log.info("Status endpoint called.");
-        log.debug("The following values are to be delivered through the endpoint: Name: '{}', Environment: '{}'", config.getName(), config.getEnvironment());
+        log.debug("The following values are to be delivered through the endpoint: Name: '{}', Environment: '{}'", applicationName, environment);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> jsonData = new HashMap<>();
-        jsonData.put("Application", config.getName());
-        jsonData.put("Environment", config.getEnvironment());
+        jsonData.put("Application", applicationName);
+        jsonData.put("Environment", environment);
 
         try {
             return objectMapper.writeValueAsString(jsonData);
