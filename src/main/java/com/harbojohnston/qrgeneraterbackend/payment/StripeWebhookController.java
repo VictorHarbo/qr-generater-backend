@@ -1,4 +1,7 @@
 package com.harbojohnston.qrgeneraterbackend.payment;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.harbojohnston.qrgeneraterbackend.CurrentOrders;
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
@@ -20,8 +23,11 @@ public class StripeWebhookController {
     @Value("${stripe.webhook.secret}")
     private String ENDPOINT_SECRET;
 
+    public String sessionId;
+
     @PostMapping("/webhook")
     public String handleWebhook(HttpServletRequest request) {
+        String orderId;
         String payload;
         try {
             payload = new BufferedReader(request.getReader()).lines().collect(Collectors.joining("\n"));
@@ -37,16 +43,27 @@ public class StripeWebhookController {
 
             if ("checkout.session.completed".equals(event.getType())) {
                 Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
-                log.info("Payment successful for session: " + session.getId());
-                // Handle successful payment
+                log.info("Payment successful for session: '{}'", session.getId());
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(payload);
+
+                orderId = jsonNode.get("data")
+                        .get("object").get("metadata").get("orderId").asText();
+
+                CurrentOrders.updateOrder(orderId);
+                log.info("Updated status for orderId: '{}' to true", orderId);
             }
 
-        } catch (Exception e) {
+        } catch (NullPointerException e){
+            log.error("No order ID was present in the webhook data. Verification failed.");
+        }
+        catch (Exception e) {
             log.info("An error occurred while processing payload", e);
             return "Webhook signature verification failed";
         }
 
-        log.info("Webhook processed for request: '{}' ", request);
+        log.debug("Webhook processed for request: '{}' ", request);
         return "Webhook processed";
     }
 }
