@@ -12,9 +12,9 @@ import java.util.Optional;
 public interface OrdersRepository extends JpaRepository<OrderEntity, Long> {
 
     @Modifying
-    @Transactional
-    @Query("UPDATE OrderEntity o SET o.paymentCompleted = :paymentCompleted WHERE o.id = :id")
-    int updatePaymentStatus(@Param("id") Long id, @Param("paymentCompleted") boolean paymentCompleted);
+    @Query("UPDATE OrderEntity o SET o.paymentCompleted = :paymentCompleted WHERE o.uuid = :uuid")
+    int updatePaymentCompletedByUuid(@Param("uuid") String uuid, @Param("paymentCompleted") boolean paymentCompleted);
+
 
 
     Optional<OrderEntity> findByUuid(String uuid);
