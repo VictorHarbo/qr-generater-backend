@@ -21,4 +21,21 @@ public class OrdersController {
     public OrderEntity createOrder(@RequestBody OrderEntity orderEntity) {
         return ordersRepository.save(orderEntity);
     }
+
+    /**
+     * Update the "paymentCompleted" field for a specific Orders entry
+     * @param id of the order to update
+     * @param paymentCompleted boolean value
+     * @return
+     */
+    @PatchMapping("/{id}")
+    public String updatePaymentStatus(@PathVariable Long id, @RequestBody boolean paymentCompleted) {
+        int updated = ordersRepository.updatePaymentStatus(id, paymentCompleted);
+
+        if (updated > 0) {
+            return "Payment status updated successfully!";
+        } else {
+            return "Payment not found.";
+        }
+    }
 }

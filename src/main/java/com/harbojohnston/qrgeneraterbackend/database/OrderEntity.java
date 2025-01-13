@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 
 @Entity
 public class OrderEntity {
@@ -15,6 +16,9 @@ public class OrderEntity {
     private String url;
 
     private boolean paymentCompleted;
+
+    @Column(unique = true, updatable = false)
+    private String uuid;
 
     // Getters and Setters
 
@@ -40,5 +44,13 @@ public class OrderEntity {
 
     public void setPaymentCompleted(boolean paymentCompleted) {
         this.paymentCompleted = paymentCompleted;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }
