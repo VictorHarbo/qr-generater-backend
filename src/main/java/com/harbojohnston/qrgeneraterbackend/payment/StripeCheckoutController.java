@@ -1,11 +1,13 @@
 package com.harbojohnston.qrgeneraterbackend.payment;
 
 import com.harbojohnston.qrgeneraterbackend.CurrentOrders;
+import com.harbojohnston.qrgeneraterbackend.database.OrderService;
 import com.stripe.Stripe;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,9 @@ import java.util.UUID;
 public class StripeCheckoutController {
 
     private static final Logger log = LoggerFactory.getLogger(StripeCheckoutController.class);
+
+    @Autowired
+    private OrderService orderService;
 
     @Value("${stripe.secret.key}")
     private String apiKey;
@@ -32,16 +37,17 @@ public class StripeCheckoutController {
     public Map<String, String> createCheckoutSession(@RequestBody Map<String, Object> data) throws Exception {
         Stripe.apiKey = apiKey;
 
-        log.info("Input URL is: '{}'", data.get("inputUrl"));
+        String orderId = UUID.randomUUID().toString();
+        String inputUrl = (String) data.get("inputUrl");
+
+        log.info("Input URL is: '{}'", inputUrl);
 
         Map<String, String> orderMetadata = new HashMap<>();
-        String orderId = UUID.randomUUID().toString();
+        // Add orderId to metadata which is sent to stripe
         orderMetadata.put("orderId", orderId);
-        CurrentOrders.addOrder(orderId, false);
-
-
-        log.debug("Received data with id: '{}' and quantity: '{}'. Created order with orderId: '{}'"
-                , data.get("id"),  data.get("quantity"), orderId);
+        // Create the order in the db
+        orderService.createNewPayment(orderId, inputUrl);
+        log.info("Created order with orderId: '{}'", orderId);
 
         SessionCreateParams.LineItem lineItem = SessionCreateParams.LineItem.builder()
                 // 2 euros
