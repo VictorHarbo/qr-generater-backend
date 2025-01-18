@@ -8,7 +8,7 @@ WORKDIR /app
 # Copy the pom.xml and the source code
 COPY pom.xml .
 COPY src ./src
-COPY config ./config
+COPY config/application.yml ./src/main/resources/application.yml
 
 
 # Build project with maven
