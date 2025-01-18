@@ -16,7 +16,9 @@ public class WebConfig {
 
         config.setAllowCredentials(true);
         config.addAllowedOrigin("https://qr-generater.com"); // Replace with your frontend URL
-        config.addAllowedOrigin("http://frontend:80");  // For Docker internal communication
+        config.addAllowedOrigin("http://qr-generater-frontend");  // For Docker internal communication
+        config.addAllowedOrigin("http://localhost:8080");  
+        config.addAllowedOrigin("http://localhost:80");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
 
