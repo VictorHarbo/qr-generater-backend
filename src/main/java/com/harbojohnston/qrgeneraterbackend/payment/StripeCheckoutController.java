@@ -33,6 +33,12 @@ public class StripeCheckoutController {
     @Value("${stripe.prices.euros.two}")
     private String priceTwoEuros;
 
+    @Value("${returnUrs.success}")
+    private String successUrl;
+
+    @Value("${returnUrs.cancel}")
+    private String cancelUrl;
+
     @PostMapping("/create-checkout-session")
     public Map<String, String> createCheckoutSession(@RequestBody Map<String, Object> data) throws Exception {
         Stripe.apiKey = apiKey;
@@ -61,8 +67,8 @@ public class StripeCheckoutController {
                 .putAllMetadata(orderMetadata)
                 .addLineItem(lineItem)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:5173/success?id=" + orderId)
-                .setCancelUrl("http://localhost:5173/")
+                .setSuccessUrl(successUrl + "?id=" + orderId)
+                .setCancelUrl(cancelUrl)
                 .build();
 
         Session session = Session.create(params);
