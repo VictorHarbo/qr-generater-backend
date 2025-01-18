@@ -1,7 +1,10 @@
 package com.harbojohnston.qrgeneraterbackend;
 
+import com.harbojohnston.qrgeneraterbackend.database.OrderEntity;
+import com.harbojohnston.qrgeneraterbackend.database.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +21,9 @@ import java.io.IOException;
 @RestController
 public class QrController {
     private static final Logger log = LoggerFactory.getLogger(QrController.class);
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping("/generateQr")
     public ResponseEntity<byte[]> generateQr(@RequestParam() String url) {
@@ -41,18 +47,9 @@ public class QrController {
         }
 
         try {
-            // Create a buffered image with a QR code for the input URL.
-            BufferedImage image = QrGenerator.generate(url);
+            byte[] imageBytes = getQrCodeAsByteArray(url);
 
-            // Convert BufferedImage to byte array
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpeg", baos);
-            byte[] imageBytes = baos.toByteArray();
-
-            // Prepare response
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "image/jpeg");
-            headers.setContentDisposition(ContentDisposition.attachment().filename("qrcode.jpeg").build());
+            HttpHeaders headers = prepareHttpResponse();
 
             log.info("Returning a QR code for URL: '{}'", url);
             return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
@@ -60,5 +57,57 @@ public class QrController {
             log.error("IOException while generating QR code", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/generateQrByOrderNumber")
+    public ResponseEntity<byte[]> generateQrFromOrderNumber(@RequestParam() String orderNumber) {
+        if (orderNumber == null || orderNumber.isEmpty()) {
+            String message = "A QR code cannot be generated without an input order number.";
+            log.error(message);
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(message.getBytes());
+        }
+
+
+        log.debug("Started generating QR code for order number: '{}'", orderNumber);
+        OrderEntity order = orderService.getEntityByUuid(orderNumber);
+
+        if (order.isPaymentCompleted()) {
+            try {
+                byte[] qrCode = getQrCodeAsByteArray(order.getUrl());
+                HttpHeaders headers = prepareHttpResponse();
+
+                log.info("Created QR code for order number: '{}'", orderNumber);
+                return new ResponseEntity<>(qrCode, headers, HttpStatus.OK);
+            } catch (IOException e) {
+                log.error("IOException while generating QR code", e);
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            log.error("Payment for order: '{}' has not been completed.", order.getUuid());
+            return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
+        }
+    }
+
+    private static HttpHeaders prepareHttpResponse() {
+        // Prepare response
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "image/jpeg");
+        headers.setContentDisposition(ContentDisposition.attachment().filename("qrcode.jpeg").build());
+        return headers;
+    }
+
+
+    private static byte[] getQrCodeAsByteArray(String url) throws IOException {
+        // Create a buffered image with a QR code for the input URL.
+        BufferedImage image = QrGenerator.generate(url);
+
+        // Convert BufferedImage to byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpeg", baos);
+        byte[] imageBytes = baos.toByteArray();
+        return imageBytes;
     }
 }

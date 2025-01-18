@@ -17,6 +17,6 @@ public interface OrdersRepository extends JpaRepository<OrderEntity, Long> {
 
 
 
-    Optional<OrderEntity> findByUuid(String uuid);
+    Optional<OrderEntity> findByUuid(@Param("uuid") String uuid);
 
 }

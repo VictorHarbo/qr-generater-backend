@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class OrderService {
 
@@ -24,5 +26,10 @@ public class OrderService {
         if (updatedCount == 0) {
             throw new IllegalArgumentException("No payment record found with UUID: " + uuid);
         }
+    }
+
+    public OrderEntity getEntityByUuid(String uuid) {
+        Optional<OrderEntity> entity = repository.findByUuid(uuid);
+        return entity.orElseThrow(() -> new RuntimeException("Entity not found with uuid: " + uuid));
     }
 }
