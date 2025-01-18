@@ -4,12 +4,12 @@ FROM maven:3.9.9-eclipse-temurin-23 AS builder
 # Set the working directory in the container
 WORKDIR /app
 
-# Clone project from github
-RUN apt-get update && apt-get install -y git && \
-    git clone https://github.com/VictorHarbo/qr-generater-backend.git .
 
-# Install less for better file viewing
-RUN apt-get install less
+# Copy the pom.xml and the source code
+COPY pom.xml .
+COPY src ./src
+COPY config ./config
+
 
 # Build project with maven
 RUN mvn clean package
