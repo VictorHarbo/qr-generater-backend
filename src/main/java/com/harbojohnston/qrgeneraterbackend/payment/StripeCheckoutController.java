@@ -33,10 +33,10 @@ public class StripeCheckoutController {
     @Value("${stripe.prices.euros.two}")
     private String priceTwoEuros;
 
-    @Value("${returnUrs.success}")
+    @Value("${returnUrls.success}")
     private String successUrl;
 
-    @Value("${returnUrs.cancel}")
+    @Value("${returnUrls.cancel}")
     private String cancelUrl;
 
     @PostMapping("/create-checkout-session")
