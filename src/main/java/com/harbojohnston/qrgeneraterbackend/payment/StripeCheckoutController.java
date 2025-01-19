@@ -27,6 +27,9 @@ public class StripeCheckoutController {
     @Value("${stripe.secret.key}")
     private String apiKey;
 
+    @Value("${stripe,prices.current}")
+    private String price;
+
     @Value("${stripe.prices.free}")
     private String priceFree;
 
@@ -56,10 +59,7 @@ public class StripeCheckoutController {
         log.info("Created order with orderId: '{}'", orderId);
 
         SessionCreateParams.LineItem lineItem = SessionCreateParams.LineItem.builder()
-                // 2 euros
-                // .setPrice(priceTwoEuros)
-                // Free
-                .setPrice(priceFree)
+                .setPrice(price)
                 .setQuantity(Long.valueOf((String) data.get("quantity")))
                 .build();
 
