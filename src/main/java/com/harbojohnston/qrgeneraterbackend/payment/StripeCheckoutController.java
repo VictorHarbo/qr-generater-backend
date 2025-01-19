@@ -27,7 +27,7 @@ public class StripeCheckoutController {
     @Value("${stripe.secret.key}")
     private String apiKey;
 
-    @Value("${stripe,prices.current}")
+    @Value("${stripe.prices.current}")
     private String price;
 
     @Value("${stripe.prices.free}")
